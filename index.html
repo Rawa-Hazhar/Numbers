@@ -132,51 +132,74 @@
 
    <script>
         const numberWords = {
-            0: 'سفر', 1: 'یەک', 2: 'دوو', 3: 'سێ', 4: 'چوار', 5: 'پێنج',
-            6: 'شەش', 7: 'حەوت', 8: 'هەشت', 9: 'نۆ', 10: 'دە',
-            11: 'یانزە', 12: 'دوانزە', 13: 'سیانزە', 14: 'چواردە', 15: 'پانزە',
-            16: 'شانزە', 17: 'حەڤدە', 18: 'هەژدە', 19: 'نۆزدە', 20: 'بیست',
-            30: 'سی', 40: 'چل', 50: 'پەنجا', 60: 'شەست', 70: 'حەفتا',
-            80: 'هەشتا', 90: 'نەوەد', 100: 'سەد', 1000: 'هەزار'
-        };
+    0: 'سفر', 1: 'یەک', 2: 'دوو', 3: 'سێ', 4: 'چوار', 5: 'پێنج',
+    6: 'شەش', 7: 'حەوت', 8: 'هەشت', 9: 'نۆ', 10: 'دە',
+    11: 'یازدە', 12: 'دوازدە', 13: 'سێزدە', 14: 'چواردە', 15: 'پازدە',
+    16: 'شازدە', 17: 'حەڤدە', 18: 'هەژدە', 19: 'نۆزدە', 20: 'بیست',
+    30: 'سی', 40: 'چل', 50: 'پەنجا', 60: 'شەست', 70: 'حەفتا',
+    80: 'هەشتا', 90: 'نەوەد', 100: 'سەد', 1000: 'هەزار'
+};
 
-        function numberToWords(num) {
-            if (num === 0) return numberWords[0];
-            if (num in numberWords) return numberWords[num];
+function numberToWords(num) {
+    if (num === 0) return numberWords[0];
+    if (num in numberWords) return numberWords[num];
 
-            let words = [];
+    let words = [];
 
-            if (num >= 100000) {
-                words.push(numberToWords(Math.floor(num / 100000)) + ' ' + numberWords[100]);
-                num %= 100000;
-                if (num > 0) words.push('هەزار');
-            }
-
-            if (num >= 1000) {
-                if (Math.floor(num / 1000) > 1) {
-                    words.push(numberToWords(Math.floor(num / 1000)));
-                }
-                words.push(numberWords[1000]);
-                num %= 1000;
-            }
-
-            if (num >= 100) {
-                words.push(numberWords[Math.floor(num / 100)] + ' ' + numberWords[100]);
-                num %= 100;
-            }
-
-            if (num > 0) {
-                if (num <= 20) {
-                    words.push(numberWords[num]);
-                } else {
-                    const tens = Math.floor(num / 10) * 10;
-                    const ones = num % 10;
-                    words.push(numberWords[tens] + (ones > 0 ? ' و ' + numberWords[ones] : ''));
-                }
-            }
-
-            return words.join(' و ');
+    if (num >= 100000) {
+        words.push(numberToWords(Math.floor(num / 1000)) + ' ' + numberWords[1000]);
+        num %= 1000;
+    } else if (num >= 1000) {
+        const thousands = Math.floor(num / 1000);
+        if (thousands > 1) {
+            words.push(numberToWords(thousands) + ' ' + numberWords[1000]);
+        } else {
+            words.push(numberWords[1000]);
         }
+        num %= 1000;
+    }
+
+    if (num >= 100) {
+        const hundreds = Math.floor(num / 100);
+        if (hundreds > 1) {
+            words.push(numberWords[hundreds] + ' ' + numberWords[100]);
+        } else {
+            words.push(numberWords[100]);
+        }
+        num %= 100;
+    }
+
+    if (num > 0) {
+        if (num <= 20) {
+            words.push(numberWords[num]);
+        } else {
+            const tens = Math.floor(num / 10) * 10;
+            const ones = num % 10;
+            words.push(numberWords[tens] + (ones > 0 ? ' و ' + numberWords[ones] : ''));
+        }
+    }
+
+    return words.join(' و ');
+}
+
+document.getElementById('convertBtn').addEventListener('click', function() {
+    const input = document.getElementById('numberInput');
+    const resultText = document.getElementById('resultText');
+    const resultContainer = document.getElementById('resultContainer');
+    
+    const num = parseInt(input.value);
+    
+    if (isNaN(num) || num < 0 || num > 999999) {
+        resultText.textContent = 'تکایە ژمارەیەکی دروست لە نێوان ٠ و ٩٩٩,٩٩٩ بنووسە.';
+        resultText.classList.add('text-red-600');
+    } else {
+        const words = numberToWords(num);
+        resultText.textContent = `${num.toLocaleString('ar-EG')} = ${words}`;
+        resultText.classList.remove('text-red-600');
+    }
+    
+    resultContainer.classList.remove('hidden');
+});
 
         document.getElementById('convertBtn').addEventListener('click', function() {
             const input = document.getElementById('numberInput');
